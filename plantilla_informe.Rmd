@@ -1,0 +1,32 @@
+---
+title: "Informe automatizado"
+output:
+  html_document:
+    toc: yes
+    toc_float: yes
+    number_sections: yes
+    theme: readable
+params:
+  informe: NA
+  fecha_intervencion: NA
+  inicio_obs: NA
+  fin_obs: NA
+  modo: NA
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+# Parámetros del análisis
+
+Fecha intervención: `r params$fecha_intervencion`  
+Inicio observación: `r params$inicio_obs`  
+Fin observación: `r params$fin_obs`  
+Modo: `r params$modo`
+
+# Resultados
+
+```{r, results='asis'}
+params$informe
+```
