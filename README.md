@@ -1,81 +1,45 @@
-<div align="center">
+# Análisis de impacto de intervenciones en series temporales
 
-# 📈 Series Temporales: Análisis de Impacto de Intervenciones
+Aplicación web desarrollada en **R Shiny** para analizar la evolución de series temporales (como el consumo o prescripción de medicamentos) y cuantificar el efecto de una intervención comparando los datos reales frente a un escenario contrafactual.
 
-![R](https://shields.io)
-![Shiny](https://shields.io)
-![R Markdown](https://shields.io)
+> ### [**Abrir aplicación en línea**](https://janiretx.shinyapps.io/Series_temporales_medicamentos/)
 
-**Aplicación interactiva desarrollada en R Shiny para evaluar el efecto de intervenciones en series temporales mediante escenarios contrafactuales.**
+## Qué hace la aplicación
 
-[![Abrir App](https://shields.io🚀_Abrir_Aplicación_en_Línea-2EA44F?style=for-the-badge)](https://janiretx.shinyapps.io/Series_temporales_medicamentos/)
+* **Series individuales:** Permite analizar una o varias series a la vez. Puedes elegir entre ajustar un único modelo ganador para todas las series (*Modo Global*) o seleccionar el mejor modelo de forma independiente para cada serie (*Modo Individual*). Incluye gráficos interactivos y exportación de informes.
+* **Análisis de ratios:** Calcula el ratio semanal a partir de numeradores y denominadores ($\sum \text{numerador} / \sum \text{denominador}$), modelizando tanto la serie original como su media móvil de orden 4.
 
-</div>
+## Modelos incluidos
 
----
+Todos los modelos se entrenan únicamente con los datos anteriores a la fecha de intervención para proyectar qué habría ocurrido sin ella:
 
-<details>
-<summary><b>📑 Tabla de Contenidos</b></summary>
+* **ARIMA + Fourier:** Modelo ARIMA no estacional con tendencia lineal y pares seno/coseno de Fourier (frecuencia semanal = 52). El número óptimo de términos ($K \in$) se selecciona minimizando el `AICc`.
+* **Prophet:** Modelo aditivo que detecta automáticamente cambios de tendencia (*changepoints*) y ajusta la estacionalidad anual y semanal mediante series de Fourier.
+* **STL + ARIMA:** Descompone la serie en estacionalidad, tendencia y residuo mediante STL, y ajusta un modelo ARIMA sobre el componente residual.
+* **STL + ETS:** Utiliza la misma descomposición STL, pero modela el residuo mediante suavizado exponencial (ETS).
 
-- [🎯 Objetivo](#-objetivo)
-- [✨ Funcionalidades Principales](#-funcionalidades-principales)
-- [🧮 Metodología Estadística](#-metodología-estadística)
-- [📂 Formato de los Datos](#-formato-de-los-datos)
-- [🔍 Interpretación de Resultados](#-interpretación-de-resultados)
-- [🛠️ Tecnologías Utilizadas](#️-tecnologías-utilizadas)
-- [⚠️ Consideraciones](#️-consideraciones)
+## Estructura del archivo de entrada
 
-</details>
+Para el análisis de series individuales hay que subir un fichero Excel (`.xlsx`) que contenga exactamente estas tres columnas:
 
----
+| Columna | Descripción | Formato |
+| :--- | :--- | :--- |
+| `fecha` | Fecha semanal de observación | `YYYY-MM-DD` |
+| `tipo` | Nombre o categoría de la serie (ej. tipo de fármaco) | Texto |
+| `pacientes` | Valor numérico semanal | Numérico |
 
-## 🎯 Objetivo
+## Lectura de resultados
 
-Comparar **valores observados** frente a **valores esperados** en un escenario contrafactual (sin intervención) mediante la modelización estadística de series temporales.
+* **Gráficos:** La línea gris muestra los datos observados, la verde continua el ajuste del modelo antes de la intervención, la verde discontinua la proyección contrafactual y la línea roja vertical marca la fecha de intervención.
+* **Tablas:** Durante el periodo de observación definido se calcula la diferencia ($\text{Observado} - \text{Predicho}$) y el porcentaje de variación o caída respecto a lo esperado: $(\text{Diferencia} / \text{Predicho}) \times 100$.
 
----
+## Tecnologías
 
-## ✨ Funcionalidades Principales
+* **R** y **Shiny** para el cálculo estadístico y la interfaz.
+* **R Markdown** para la generación automática de informes descargables.
+* **CSS** para los estilos de la aplicación.
 
-* **📊 Series Individuales:** Permite el análisis múltiple o individual de series mediante estrategias de modelización globales o personalizadas, con generación de gráficos y reportes interactivos.
-* **⚖️ Análisis de Ratios:** Calcula ratios semanales a partir de la relación entre numeradores y denominadores, evaluando la serie original y su media móvil de orden 4.
-
----
-
-## 🧮 Metodología Estadística
-
-> [!NOTE]
-> Los modelos se entrenan **exclusivamente con datos previos a la intervención** para proyectar el escenario contrafactual.
-
-* **ARIMA + Fourier:** Combina ARIMA no estacional con tendencia lineal y términos de Fourier seleccionados por `AICc`.
-* **Prophet:** Captura tendencias con cambios estructurales y estacionalidad mediante funciones de Fourier.
-* **STL + ARIMA / STL + ETS:** Descompone la serie (estacionalidad, tendencia y residuo) y modela el componente residual con ARIMA o suavizado exponencial.
-
----
-
-## 📂 Formato de los Datos
-
-Los archivos Excel (`.xlsx`) para series individuales requieren tres columnas:
-* `fecha`: Fecha semanal (`YYYY-MM-DD`).
-* `tipo`: Identificador de la serie (texto).
-* `pacientes`: Valor semanal registrado (numérico).
-
----
-
-## 🔍 Interpretación de Resultados
-
-* **Leyenda:** Grises para valores observados, verde continuo para ajuste previo, verde discontinuo para la predicción contrafactual y línea roja vertical para la fecha de intervención.
-* **Métricas:** Calcula la diferencia ($\text{Observado} - \text{Predicho}$) y el porcentaje de caída durante el periodo de observación.
-
----
-
-## 🛠️ Tecnologías Utilizadas
-
-* **R, Shiny, CSS y R Markdown** para el procesamiento, interfaz visual y generación de reportes.
-
----
 
 ## ⚠️ Consideraciones
 
-> [!IMPORTANT]
 > La fiabilidad de los resultados depende de la calidad de los datos iniciales y el comportamiento histórico de cada serie. Las estimaciones son de carácter estadístico.
